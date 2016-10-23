@@ -13,5 +13,55 @@ putBack()	--> Swapping of tiles from the tray and bag. But if anybody uses swap 
 				as one move. 
 '''
 
+import random, tile
+
 class Bag:
+
+	def __init__(self):
+		self.tiles = []
+
+		# Add initial distribution of tiles.
+		self.add('A', 7)
+		self.add('B', 3)
+		self.add('C', 4)
+		self.add('D', 5)
+		self.add('E', 8)
+		self.add('F', 3)
+		self.add('G', 3)
+		self.add('H', 3)
+		self.add('I', 7)
+		self.add('J', 1)
+		self.add('K', 2)
+		self.add('L', 5)
+		self.add('M', 5)
+		self.add('N', 5)
+		self.add('O', 7)
+		self.add('P', 3)
+		self.add('Qu', 1)
+		self.add('R', 5)
+		self.add('S', 6)
+		self.add('T', 5)
+		self.add('U', 5)
+		self.add('V', 1)
+		self.add('W', 2)
+		self.add('X', 1)
+		self.add('Y', 2)
+		self.add('Z', 1)
+
+		random.shuffle(self.tiles)
+
+	# Add all the letter tiles into bag.
+	def add(self, ltr, n):
+		for i in range(n):
+			self.tiles.append(tile.Tile(ltr))
 	
+	def shuffle(self):
+		random.shuffle(self.tiles)
+
+	def isEmpty(self):
+		if len(self.tiles) == 0:
+			return True
+		return False
+
+	def putBack(self, tile):
+		self.tiles.append(tile)
