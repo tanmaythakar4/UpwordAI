@@ -1,0 +1,121 @@
+# Upwords Game
+
+#	Letters can be stacked five tiles high.
+#	100 tiles(letters) are available.
+#	Focus more on Uppercase words (for developer)
+
+# 	Distribution of letters 	--> No. of times  * tiles 	--> Total Tiles
+
+#	J | Qu | V | X | Z 			--> 			1 * 5		-->		5
+#	K | W | Y					-->				2 * 3		-->		6
+#	B | F | G | H | P			-->				3 * 5		-->		15
+#	C 							-->				4 *	1		-->		4
+#	D | L | M | N | R | T | U 	-->				5 * 7 		-->		35
+#	S 							-->				6 * 1		-->		6
+#	A | I | O 					-->				7 * 3		-->		21
+#	E							-->				8 * 1		-->		8
+																----------
+#													  Total tiles: 100
+
+
+#	Every player needs to draw one tile from the bag and whoever draws the tile nearest to the letter 		'A' plays first.
+
+#	Initially each player DRAWS SEVEN LETTER TILES each from the bag.
+
+#	Whoever plays first must FORM A WORD OF TWO OR MORE THAT COVERS AT LEAST ONE OF THE FOUR GAME 			SQUARES IN THE CENTER of the gameboard.
+
+#	On your turn, play one or more letter tiles, 
+		-	either to form a new word that connects to a word already on the board, 
+		-	or to change a word already on the board to a different word.
+
+		ALL LETTERS PLAYED ON YOUR TURN MUST BE IN THE SAME ROW OF GAME SQUARES EITHER ACROSS OR DOWN.
+
+#	Calculate the score points, then draw letter tiles from the draw pile (Bag) to replace the ones you 	played.
+
+#	A word is leagal if it is in the dictionary.
+
+#	YOU CAN PLAY LETTERS TO FORM A WORD THAT READ ACROSS (FROM LEFT TO RIGHT ONLY) OR DOWN THE GAMEBOARD 	 (NEVER DIAGONALLY OR UP) AND CONNECTS TO A WORD ALREADY ON THE BOARD.
+
+#	Any letter in your word that is ADJACENT TO ANOTHER LETTER OR LETTERS ON THE BOARD MUST FORM A WORD.
+
+#	----------------	Stack 	----------------
+
+#	Stacking letters on top of the letters already on the board to change a word into a different word.
+
+#	YOU CANNOT PLAY MORE THAN ONE LETTER ON THE SAME STACK DURING ONE TURN.
+
+#	You cannot stack a letter on the same letter - for example 'A' on an 'A'.
+
+# pg 7
+
+#	You cannot simply add an 'S' to a word already on the board to form a plural.
+
+#	----------------	Score 	----------------
+
+#	You SCORE 2 POINTS PER LETTER TILE for any word formed with all letters only ONE TILE HIGH (no 			letter in the word is stacked on top of another letter).
+
+#	You SCORE 1 POINTS PER LETTER TILE for any word formed that contains ANY LETTERS STACKED TWO OR MORE 	 TILES HIGH. Count each letter in your word and every letter tile under each letter of your word to 	get your score.
+
+#	You score 2 EXTRA BONUS POINTS IF YOU USE THE 'QU' LETTER TILE in any word formed with all letter 		with only ONE TILE HIGH. 
+
+#	YOU DO NOT RECEIVE ANY BONUS POINTS IF YOU USE THE 'QU' TILE IN A WORD FORMED WITH ANY OF ITS 			LETTERS MORE THAN ONE TILE HIGH.
+
+#	You SCORE 20 EXTRA BONUS POINTS if you USE ALL SEVEN OF YOUR LETTERS TILES IN ONE TURN.
+
+#	If you FORM TWO OR MORE WORDS IN THE SAME TURN, each word is scored. Any letter or stack of letters 	common to these words is scored for each word.
+
+#	At the END OF THE GAME, 5 POINTS ARE SUBTRACTED FROM YOUR SCORE FOR EACH LETTER TILE YOU CANNOT PLAY.
+
+#	----------------	Illegal words 	----------------
+
+#	Words that are always capitalized are illegal.
+
+#	Words requiring a hyphen are illegal.
+
+#	Words requiring an apostrophe are illegal.
+
+#	Abbreviations and symbols are illegal.
+
+#	Prefix and suffixes, that can not stand alone, are illegal.
+
+#	Foreign words are illegal unless they appear in the dictionary.
+
+#	----------------	Challenging a word 	----------------
+
+#	You can challenge an opponent's word if you think it's misspelled or an illegal word. The word must 	be challenged before another word is played.
+
+#	If the challenged word is illegal, the player who played it removes the letter tiles from the board 	and either plays another word or passes.
+
+#	----------------	Passing		----------------
+
+#	You may pass your turn at any time during the game.
+
+#	----------------	Exchanging your letters 	----------------
+
+#	On your turn, you may exchange one of your letter tiles for a new one.
+
+#	Just turn the tile you want to exchange letter-side down and draw a replacement tile from the draw 		pile. Return the tile you turned down to the draw pile (bag) and mix it up.
+
+#	As a penalty, you lose your turn. Sometimes it is a good strategy to give up a turn in order to 		exchange a letter.
+
+#	----------------	How to end the game 	----------------
+
+#	The game is over as soon as any of the following situations occur:
+
+#	When one player uses all of hidher letter tiles, and no tiles remain in the draw pile; or
+
+#	When none of the players can make a word on the board with the tiles they have left on their racks, 	and there are no more tiles in the draw pile (from which to exchange a letter tile); or
+
+#	When all of the players pass their turn in consecutive order, When the game is over, total each 		player's final score. Subtract 5 points from a player's score for each letter tile he/she has not 		played.
+
+#	----------------	How to win		----------------
+
+#	The player who scores the most points wins.
+
+#	----------------	Solo play rules		----------------
+
+#	Make words, one at a time, and score points for every word you make.
+
+#	During the game, you are allowed to exchange five letters without a penalty.
+
+#	The game ends either (1) when all of the letter tiles have been used, or (2) when you cannot make a 	word or exchange a letter tile.Total up your score. Keep track of your solo game scores and try to 		improve each time you play.
