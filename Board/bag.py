@@ -1,16 +1,67 @@
 # -*- coding: utf-8 -*-
 '''
-This file maintain the bag of character or tile which we are using through out 
-the game
-for example it may contain method
-to add letter in starting,
-shuffule the bag,
-grab,
-putback,
-check(empty or not)
+Initial distribution of tiles(letter)
+This file maintain the bag of all characters or tiles which we are using through out the game.
 
+Methods: 	--> Explanation
 
-little bit change
-Testing 1
-
+add() 		--> Initially add all tiles to the bag.
+shuffle() 	--> Shuffule the bag.
+grab()		--> Grab the tiles from the bag randomly.
+isEmpty()	--> Check whether bag is empty or not.
+putBack()	--> Swapping of tiles from the tray and bag. But if anybody uses swap then it will count 
+				as one move. 
 '''
+
+import random, tile
+
+class Bag:
+
+	def __init__(self):
+		self.tiles = []
+
+		# Add initial distribution of tiles.
+		self.add('A', 7)
+		self.add('B', 3)
+		self.add('C', 4)
+		self.add('D', 5)
+		self.add('E', 8)
+		self.add('F', 3)
+		self.add('G', 3)
+		self.add('H', 3)
+		self.add('I', 7)
+		self.add('J', 1)
+		self.add('K', 2)
+		self.add('L', 5)
+		self.add('M', 5)
+		self.add('N', 5)
+		self.add('O', 7)
+		self.add('P', 3)
+		self.add('Qu', 1)
+		self.add('R', 5)
+		self.add('S', 6)
+		self.add('T', 5)
+		self.add('U', 5)
+		self.add('V', 1)
+		self.add('W', 2)
+		self.add('X', 1)
+		self.add('Y', 2)
+		self.add('Z', 1)
+
+		random.shuffle(self.tiles)
+
+	# Add all the letter tiles into bag.
+	def add(self, ltr, n):
+		for i in range(n):
+			self.tiles.append(tile.Tile(ltr))
+	
+	def shuffle(self):
+		random.shuffle(self.tiles)
+
+	def isEmpty(self):
+		if len(self.tiles) == 0:
+			return True
+		return False
+
+	def putBack(self, tile):
+		self.tiles.append(tile)
