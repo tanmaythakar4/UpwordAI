@@ -119,9 +119,8 @@ class Dictionary:
 if __name__ == '__main__':
     dic = Dictionary('../dictionary.txt')
     print(dic.findlength())
-    d = "NAUTICAL"
     
-    #print(dic.isValid(d))
+    print(dic.isValid(d))
     #print(dic.lookuptime)
      
     e = "HOME"
@@ -129,5 +128,5 @@ if __name__ == '__main__':
    # print(dic.lookuptime)
     
     
-    print(dic.matchWithBlanks('H'+' '+'M'+'E'))
+    #print(dic.matchWithBlanks('H'+' '+'M'+'E'))
     

@@ -11,6 +11,7 @@ check upwordrules
 
 '''
 import dictionary
+import BoardD.tile as tile
 class Board:
     
     Debug_errors = True
@@ -20,6 +21,7 @@ class Board:
                       
     def __init__(self):
         self.tiles = []
+        self.tray = []
         for x in range(Board.BOARD_SIZE):
             self.tiles.append([])
             for y in range(Board.BOARD_SIZE):
@@ -65,7 +67,7 @@ class Board:
         
         # calculate the time still working
         
-        
+        self.theWordsConsidered = ""
         #(1)
         seeds = []
 
@@ -99,7 +101,7 @@ class Board:
                                 seeds.append((x+1,y))
                                 
                         
-        print(seeds)
+        print("seeds",seeds)
             
         (maxpoint,maxtile) = -1000,None
         
@@ -173,7 +175,7 @@ class Board:
             else:
                 tileslotsmap[x1,y1,x2,y2] = True
                 i += 1
-        print(tileSlots)
+        print(len(tileSlots))
                             
         for tileslot in tileSlots:
             emptySlots = []
@@ -184,48 +186,112 @@ class Board:
                 if tile == None:
                     emptySlots.append((x,y))
                 wordBuilt.append(tile)
-            print(emptySlots)
-            print(wordBuilt)
-            print(slotPosition)
+            print("execturn=(emptyslot)==",emptySlots)
+            print("execturn=(wordBuilt)==",wordBuilt)
+            #print("tray====",len(self.tray),isFirstMove)
+            
             
             (point, tiles, blankes) = self.tryallPermutation(isFirstMove,wordBuilt,emptySlots,self.tray) 
-             # NOw we have best tile so play them 
+             
+            
+            # NOw we have best tile so play them 
              #
              #TO BE CONTINUE
         '''
         Here we have given a set of position ,this function will try all the combination of tray tiles 
-        that could be inserted and return the score and tile placed of the highrest scoring combinayion bybasking the board
+        that could be inserted and return the score and tile placed of the highest scoring combination by asking the board
         
-        
+        word = wordbuilt
+        slots = emptyslots 
         '''
     def tryallPermutation(self,isFirstMove, word, slots, traytiles, tilesPlaced = []):
-        
+        print("tryallPermutationord",slots)
         if len(slots) == 0:
             
             blankAssignment = []
-            seedRation = (-1, -1)
+            seedRatio = (-1, -1)
             
             # find a word before a validation
             i=0
             spelling= ""
+            print("word",word)
             for tile in word:
                 if tile != None:
                     spelling += tile.letter
+                    print("spelling",spelling);
                     
                 else:
                     #spelling += tilesplaced[i][1].letter
-                    spelling += tilesplaced[i]
+                    print("BBBBBBB",tilesPlaced[i][1].letter);
+                    spelling += tilesPlaced[i][1].letter
                     i+=1
-                    
+                  
             # if there no blank
             if not ' ' in spelling:
+                print("len(slots)",len(slots));
                 if self.dictionaryf.isValid(spelling) or len(slots) == 1:
+                    print("spelling233====",spelling); 
+                    self.theWordsConsidered += spelling + ","
                     
+                    # validate the word
+                else:
+                    score = -1000
+            else:
+                # get all the assignments that orrespond to real word
+                blankAssignment = self.dictionaryf.matchWithBlanks(spelling)
+                rawValidation = 0
+                if len(blankAssignment) >0:
+                    for assignmensts in blankAssignment:
+                        
+                        #Apply assignment to the blank
+                        i = 0
+                        assignedSpelling = ''
+                        for (x,y),tile in tilesPlaced: 
+                            if tile.isBlank:
+                                tile.letter = assignmensts[i]
+                                i += 1
+                            assignedSpelling += tile.letter
+                        
+                        self.theWordsConsidered += spelling + ","
+                        
+                        # validate the word
+                else:
+                    score = -1000            
+                        
+                
+            print("score, tilesPlaced, blankAssignment===", score, tilesPlaced, blankAssignment)      
+            return (score, tilesPlaced, blankAssignment)            
+        else:
+            print("HELLLLO")
+            slot = slots[0]
+            
+            print("slot",slot);
+            (maxScore, maxTiles, maxBlanks) = (-1000, None, None)
+            for tile in traytiles:
+                    print(tile.letter);
+                    newTilesPlaced = tilesPlaced[:]
+                    newTilesPlaced.append((slot, tile))
+                    trayRemaining = traytiles[:]
+                    trayRemaining.remove(tile)
+                    print("trayRemaining",len(trayRemaining))
+                    print("Sloat[1:]",slots[1:])
+                    (score,tilesTried,blankAssignment) = self.tryallPermutation(isFirstMove,word,slots[1:],trayRemaining,newTilesPlaced)
+                    if score > maxScore:
+                        maxScore, maxTiles, maxBlanks = score, tilesTried, blankAssignment
                     
+            return (maxScore, maxTiles, maxBlanks)
                 
                 
                     
-        
+     '''
+     Check if all the word played are valid or not and calculate the score too 
+     used for two purpose
+     (1) as we are calling the function play() after that
+     (2) Independently for the AI verification check
+     
+     '''
+     
+     def validateWords(self, isFirstMove , tilesP )
             
                     
                     
@@ -235,11 +301,10 @@ if __name__ == '__main__':
   boards = Board()
   #Testing
   boards.BOARD_SIZE = 5
-  boards.tiles = [[None,None,None,None,None],[None,None,'G',None,None],[None,None,'O',None,None],
-                      [None,None,'A',None,None],[None,None,'L',None,None]]
-
+  boards.tiles = [[None,None,None,None,None],[None,None,tile.Tile('G'),None,None],[None,None,tile.Tile('O'),None,None],
+                      [None,None,tile.Tile('A'),None,None],[None,None,tile.Tile('L'),None,None]]
                       
-  boards.tray = ['B','C','D','E','F','G','H',]
+  boards.tray = [tile.Tile('B'),tile.Tile('C'),tile.Tile('D')]
         
   boards.executeMove(False)    
                     
