@@ -50,6 +50,7 @@ class Dictionary:
         if board.Board.Debug_errors:
             start = time.time()
         if word in self.words:
+            print("word============================================================",word)
             sucsess = True
         else:
             sucsess = False

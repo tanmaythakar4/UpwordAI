@@ -20,3 +20,4 @@ class Tile:
               self.isBlank = False
             
           self.letter = ltr
+          self.locked = False

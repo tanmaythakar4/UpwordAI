@@ -207,7 +207,8 @@ class Board:
     def tryallPermutation(self,isFirstMove, word, slots, traytiles, tilesPlaced = []):
         print("tryallPermutationord",slots)
         if len(slots) == 0:
-            
+            if self.Debug_errors:	#Some quick metrics for analyzing the algorithm
+				startValidation = time.time()
             blankAssignment = []
             seedRatio = (-1, -1)
             
@@ -234,6 +235,7 @@ class Board:
                     self.theWordsConsidered += spelling + ","
                     
                     # validate the word
+                    (score, dummy, seedRation) = self.validateWords(isFirstMove, tilePlayed = tilesPlaced)
                 else:
                     score = -1000
             else:
@@ -251,13 +253,39 @@ class Board:
                                 tile.letter = assignmensts[i]
                                 i += 1
                             assignedSpelling += tile.letter
-                        
-                        self.theWordsConsidered += spelling + ","
+                        if self.Debug_errors:
+                            self.numValidations += 1
+                            rawValidation = 1
+                            if self.numValidations % 10 == 0:
+                                 self.theWordsConsidered += "\n"
+					    self.theWordsConsidered += assignedSpelling + ", "
+                            self.theWordsConsidered += spelling + ","
                         
                         # validate the word
+                        (score, dummy, seedRation) = self.validateWords(isFirstMove, tilePlayed = tilesPlaced)
+                        
+                        if score>0:
+                            blankAssignment = assignmensts
+                            break
                 else:
                     score = -1000            
-                        
+                 
+                if self.Debug_errors:
+				self.numRawValidations += rawValidation
+					
+			if self.Debug_errors:
+				endValidation = time.time()
+				self.validationTime += endValidation-startValidation
+			'''
+                   heuristic function after first word generate
+                   '''
+			
+                #score += self.heuristic.adjust(trayTiles = self.tray, playTiles = tilesPlaced, seedRatio = seedRatio)	
+				
+			if score > self.maxScore:
+				self.maxScore = score
+				self.maxWordTimeStamp = time.time()
+                  
                 
             print("score, tilesPlaced, blankAssignment===", score, tilesPlaced, blankAssignment)      
             return (score, tilesPlaced, blankAssignment)            
@@ -280,10 +308,29 @@ class Board:
                         maxScore, maxTiles, maxBlanks = score, tilesTried, blankAssignment
                     
             return (maxScore, maxTiles, maxBlanks)
+    
+ 
+            
+      #puts a tile on board
+    def setpiece(self, value ,tile):
+          x = value[0]
+          y = value[1]
+          assert x>=0 and y>=0 and x < self.BOARD_SIZE and y < self.BOARD_SIZE
+          assert self.tiles[x][y] == None
+          self.tiles[x][y] = tile
+      
+    # Remove tiles if we know already where they are
+    def pullTilesFast(self,tilesPlayed):
+        if tilesPlayed != None:
+            for (x,y),tile in tilesPlayed:
+                assert self.tiles[x][y] != None
+                assert self.tiles[x][y].locked == False
+                if self.tiles[x][y].isBlank:
+                    self.tiles[x][y].letter = ' '
                 
-                
-                    
-     '''
+                self.tiles[x][y] = None
+
+    '''
      Check if all the word played are valid or not and calculate the score too 
      used for two purpose
      (1) as we are calling the function play() after that
@@ -291,13 +338,194 @@ class Board:
      
      '''
      
-     def validateWords(self, isFirstMove , tilesP )
+    def validateWords(self, isFirstMove , tilesPlayed= None, inPlay= None ):
+         if self.Debug_errors:
+             startTime = time.time()
+             
+         wordBuild = [] # a list contain the ((x,y),tile)
+         
+         # IF we are doing this step seprstly from noramal  play , put the tils on the run
+         # the Algorithm (normalplay and algorithm play)
+         
+         if tilesPlayed != null:
+             inPlay = []
+             for pos,tile in tilesPlayed:
+                 self.setpiece(pos,tile)
+                 inPlay.append(pos)
+                 
+         if self.Debug_errors:
+             crosswordTimeStart = time.time()
+             self.quickValidationTime += crosswordTimeStart - startTime
+             
+         # calculate the seed ratio to return to for heuristics
+         # nilay to be continue
+         
+         # keep a list of 'words built'    
+         '''
+         Algorithm description: We can find all the crosswords by going through all the rows
+         and columns which contain tentative tiles. These are potential 'words'. Then we start
+         with a tentative tile on that row/col and expand outward in both directions until we
+         hit a blank on both ends. That becomes the 'word' created. Finally, we go through the
+         words and confirm that a previously played tile was used
+         '''
+  
+          # first build a list of possible word rows and cols ( include x and y  for first seed  )
+         rowsToCheck = []
+         colsToCheck = []
+         colset = []
+         rowset = []
+         for (x,y) in inPlay:
+              if not x in colset:
+                  colset.append(x)
+                  colsToCheck.append((x,y))
+              if not y in rowset:
+                  rowset.append(y)
+                  rowsToCheck.append((x,y))
+                  
+                  
+         #Build Word alongs the row
+         
+         for (col,row) in rowsToCheck:
+             
+             # build left
+             left = col
+             while left-1 >=0 and self.tiles[left-1][row] != None:
+                 left -=1
+                 
+             # build right
+             right = col
+             while right+1 < self.BOARD_SIZE and self.tiles[right+1][row] != None:
+                 right +=1
+             
+             # add the word if it has atleast two letter
+             if left != right:
+                 wordsBuilt.append([((x,row),self.tiles[x][row]) for x in range(left , right+1)])
+         
+         
+         
+           #build word alongs the cols
+         
+         for (col,row) in colsToCheck:
+             
+             # build up
+             up = row
+             while up-1 >=0 and self.tiles[up-1][row] != None:
+                 up -=1
+                 
+             # build down
+             down = row
+             while down+1 < self.BOARD_SIZE and self.tiles[down+1][row] != None:
+                 down +=1
+             
+             # add the word if it has atleast two letter
+             if up != down:
+                 wordsBuilt.append([((col,y),self.tiles[col][y]) for y in range(up , down+1)])
+            
+         crossWordMade = False
+         for word in wordsBuilt:
+               for ((x,y), tile) in word:
+                   if tile.locked:
+                       crossWordMade = True
+                
+            
+         if self.Debug_errors:
+             validationTimeStart = time.time()
+             self.crosswordValidationTime += time.time() - crosswordTimeStart
+
+            
+         if not crossWordMade and not isFirstMove:
+               # fail , word is not attached
+               if self.Debug_errors:
+                   self.crosswordErrors += 1
+                   if tilesPlayed == None:
+                       print("word placed must formed one crossword")
+               self.pullTilesFast(tilesPlayed)
+               return (-1, None, seedRatio)  
+              
+            # Step SIx --- To check all the words in wordbuilt are in dictionary
+            
+         spellings = []
+         for word in wordsBuilt:
+                spelling = ""
+                for (pos,tile) in word:
+                    spelling += tile.letter
+                spellings.append(spelling)
+                if not self.dictionaryf.isValid(spelling):
+                    # fail word is not in dictionary
+                    if self.Debug_errors:
+                        self.invalidWordCount += 1
+                    if tilesPlayed == None:
+                        print("isn't in the dictionary")
+                self.pullTilesFast(tilesPlayed)
+                return (-1, None, seedRatio)
+               
+         if self.DEBUG_ERRORS:
+            scoringTimeStart = time.time()
+            self.dictionaryValidationTime += time.time() - validationTimeStart
+
+                
+         # calculate the score
+         totalScore = 0
+             
+         '''
+              here might possible we have to add or delete the policy according to Upwordsss
+             
+             #(1) 50 point bonus for using all tray
+                    
+         '''
+            
+         if len(inPlay) == len(self.tray):
+                totalScore += 50
+                
+         wordScore = {} # contain word score for all words
+         wordScoreOptimize = [] #stores words where word bonuses are conflicted
+         i = 0
+         for word in wordBuilt:
+                wordScore[i] = 0
+                wordBonus = 1
+                marks=[] # we get bonus for only one word;
+                for (x,y), tile in word:
+                    letterScore = 1 # here we assume that all the letter have equal value
+                    # bonus logic if exist
+                    wordScore[i] += letterScore
+                wordScore[i] *= wordBonus
+                i += 1
+                
+        #if are conflict then all go through all permutation to retrive the highest possible score
+        '''
+        to be continue
+        
+        '''
+
+        # now add all the word score to get total score
+        for score in wordScore.values():
+            totalScore + = score
+            
+        if Board.Debug_errors:
+            self.scoringtime = time.time() - scoringTimeStart
+
+        # pull the tiles if we put that in this call
+        '''
+        left
+        
+        '''
+        
+        return (totalScore, spellings, seedRatio)
+
+            
+            
+        
+                 
+                 
+                 
+         
+         
             
                     
                     
                     
- #TEST		
-if __name__ == '__main__':	
+ #TEST        
+if __name__ == '__main__':    
   boards = Board()
   #Testing
   boards.BOARD_SIZE = 5
