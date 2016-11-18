@@ -39,7 +39,7 @@ class Dictionary:
             
             
     
-    def findlength(self):
+    def findLength(self):
         return self.words.__len__()
         
     def isValid(self,word):
