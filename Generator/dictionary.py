@@ -43,7 +43,6 @@ class Dictionary:
         return self.words.__len__()
         
     def isValid(self,word):
-        print(word)
         #print(word in self.words)
         # if you want to find out the time to find it's valid or not . it's for if it takes longer you can stop
         

@@ -199,7 +199,6 @@ class Board:
             else:
                 tileslotsmap[x1,y1,x2,y2] = True
                 i += 1
-        print(len(tileSlots))
                             
         for tileslot in tileSlots:
             emptySlots = []
@@ -216,9 +215,32 @@ class Board:
             
             
             (point, tiles, blankes) = self.tryallPermutation(isFirstMove,wordBuilt,emptySlots,self.tray) 
+            print("(point, tiles, blankes)====",point, tiles, blankes)
+            if point > maxpoint:
+                 (maxpoint,maxtile,maxBlanks) = (point, tiles, blankes)
+                 
              
             
             # NOw we have best tile so play them 
+            if maxtile != None and maxtile != []:
+                self.placeTiles(maxtile,maxBlanks)
+                playedMove = True
+                
+                seedRatio = self.calculateSeedRatio()
+                
+                #update stats
+                
+            else:
+                playedMove = False
+                
+            if self.Debug_errors:
+                endTime = time.time()
+                timeSpent = endTime - startTime + .00001
+                
+                
+            print("playedMove)====",playedMove)    
+                
+            #return playedMove
              #
              #TO BE CONTINUE
         '''
@@ -229,7 +251,6 @@ class Board:
         slots = emptyslots 
         '''
     def tryallPermutation(self,isFirstMove, word, slots, traytiles, tilesPlaced = []):
-        print("tryallPermutationord",slots)
         if len(slots) == 0:
             if self.Debug_errors:
                 startValidation = time.time()
@@ -240,22 +261,18 @@ class Board:
             # find a word before a validation
             i=0
             spelling= ""
-            print("word",word)
             for tile in word:
                 if tile != None:
                     spelling += tile.letter
-                    print("spelling",spelling);
                     
                 else:
                     #spelling += tilesplaced[i][1].letter
-                    print("BBBBBBB",tilesPlaced[i][1].letter);
                     spelling += tilesPlaced[i][1].letter
                     i+=1
                   
             # if there no blank
             if not ' ' in spelling:
                 if self.dictionaryf.isValid(spelling) or len(slots) == 1:
-                    print("spelling233====",spelling);
                     if self.Debug_errors:
                             self.numValidations += 1
                             self.numRawValidations +=1
@@ -266,7 +283,6 @@ class Board:
                     
                     # validate the word
                     (score, dummy, seedRatio) = self.validateWords(isFirstMove, tilePlayed = tilesPlaced)
-                    print("score, dummy, seedRatio=============================",score, dummy, seedRatio)
                 else:
                     score = -1000
             else:
@@ -318,21 +334,16 @@ class Board:
                 self.maxWordTimeStamp = time.time()
                   
                 
-            print("score, tilesPlaced, blankAssignment===", score, tilesPlaced, blankAssignment)      
             return (score, tilesPlaced, blankAssignment)            
         else:
-            print("HELLLLO")
             slot = slots[0]
             
-            print("slot",slot);
             (maxScore, maxTiles, maxBlanks) = (-1000, None, None)
             for tile in traytiles:
-                    print(tile.letter);
                     newTilesPlaced = tilesPlaced[:]
                     newTilesPlaced.append((slot, tile))
                     trayRemaining = traytiles[:]
                     trayRemaining.remove(tile)
-                    print("trayRemaining",len(trayRemaining))
                     print("Sloat[1:]",slots[1:])
                     (score,tilesTried,blankAssignment) = self.tryallPermutation(isFirstMove,word,slots[1:],trayRemaining,newTilesPlaced)
                     if score > maxScore:
@@ -340,12 +351,26 @@ class Board:
                     
             return (maxScore, maxTiles, maxBlanks)
     
+     # apply tiles to the board and remove it from Tray       
+    def placeTiles(self,tiles,blanks):
+        
+        i=0
+        for (pos ,tile) in tiles:
+            if tile.isBlank and blanks != None and i < len(blanks):
+                tile.letter = blanks[i]
+                i +=1
+                
+            self.setPiece(pos,tile)
+            tile.pulse()
+            self.tray.remove(tile)
+        
  
             
       #puts a tile on board
     def setPiece(self, value ,tile):
           x = value[0]
           y = value[1]
+          print("setpiece====",x,y,self.tiles[x][y].letter)
           assert x>=0 and y>=0 and x < self.BOARD_SIZE and y < self.BOARD_SIZE
           assert self.tiles[x][y] == None
           self.tiles[x][y] = tile
@@ -403,7 +428,8 @@ class Board:
          
          if tilePlayed != None:
              inPlay = []
-             for pos,tile in tilePlayed:
+             for pos, tile in tilePlayed:
+                 print("validate word tilePlayed!=None",pos,tile.letter)
                  self.setPiece(pos,tile)
                  inPlay.append(pos)
                  
@@ -446,12 +472,12 @@ class Board:
              # build left
              left = col
              while left-1 >=0 and self.tiles[left-1][row] != None:
-                 left -=1
+                 left -= 1
                  
              # build right
              right = col
              while right+1 < self.BOARD_SIZE and self.tiles[right+1][row] != None:
-                 right +=1
+                 right += 1
              
              # add the word if it has atleast two letter
              if left != right:
@@ -465,13 +491,13 @@ class Board:
              
              # build up
              up = row
-             while up-1 >=0 and self.tiles[up-1][row] != None:
-                 up -=1
+             while up-1 >=0 and self.tiles[col][up-1] != None:
+                 up -= 1
                  
              # build down
              down = row
-             while down+1 < self.BOARD_SIZE and self.tiles[down+1][row] != None:
-                 down +=1
+             while down+1 < self.BOARD_SIZE and self.tiles[col][down+1] != None:
+                 down += 1
              
              # add the word if it has atleast two letter
              if up != down:
@@ -571,7 +597,9 @@ if __name__ == '__main__':
   boards.tiles = [[None,None,None,None,None],[None,None,tile.Tile('G'),None,None],[None,None,tile.Tile('O'),None,None],
                       [None,None,tile.Tile('A'),None,None],[None,None,tile.Tile('L'),None,None]]
                       
-  boards.tray = [tile.Tile('B'),tile.Tile('C'),tile.Tile('D')]
+  boards.tray = [tile.Tile('A'),tile.Tile('O'),tile.Tile('T')]
         
-  boards.executeMove(False)    
+  #for i in range(5):
+  print(boards.executeMove(False))
+        
                     
