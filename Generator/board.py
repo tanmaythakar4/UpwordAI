@@ -12,16 +12,18 @@ check upwordrules
 '''
 import dictionary, time
 import BoardD.tile as tile
+import numpy as np
 class Board:
     
     Debug_errors = True
     DICTIONARY_FILE = '../dictionary.txt'
-    BOARD_SIZE = 10
+    BOARD_SIZE = 7
     START_POSITION = [(4,4),(4,5),(5,4),(5,5)]
                       
     def __init__(self):
         self.tiles = []
         self.tray = []
+        
         for x in range(Board.BOARD_SIZE):
             self.tiles.append([])
             for y in range(Board.BOARD_SIZE):
@@ -117,6 +119,7 @@ class Board:
                                 
                                 
                         # go right and add tile till end
+                        print("x===",x)
                         if x<self.BOARD_SIZE - 1 and self.tiles[x+1][y] == None:
                             if (x+1,y) not in seeds:
                                 seeds.append((x+1,y))
@@ -178,6 +181,7 @@ class Board:
                              
                      tileSlots.append(horz)
                      tileSlots.append(vert)
+                     
        # print(tileSlots)
                      #print("horz",horz)
                      #print("vert",vert)
@@ -370,11 +374,23 @@ class Board:
     def setPiece(self, value ,tile):
           x = value[0]
           y = value[1]
-          print("setpiece====",x,y,self.tiles[x][y].letter)
+          print("setpiece====",x,y)
           assert x>=0 and y>=0 and x < self.BOARD_SIZE and y < self.BOARD_SIZE
           assert self.tiles[x][y] == None
           self.tiles[x][y] = tile
-      
+          self.showBoard()
+     
+    #This method print the board
+    def showBoard(self):
+        for i in range(self.BOARD_SIZE):
+            str = ""
+            for j in range(self.BOARD_SIZE):
+                if(self.tiles[i][j]!= None):
+                    str += self.tiles[i][j].letter + " | "
+                else:
+                    str += "*" + " | "
+            print(str,"\n")
+ 
     # Remove tiles if we know already where they are
     def pullTilesFast(self,tilesPlayed):
         if tilesPlayed != None:
@@ -593,11 +609,19 @@ class Board:
 if __name__ == '__main__':    
   boards = Board()
   #Testing
-  boards.BOARD_SIZE = 5
-  boards.tiles = [[None,None,None,None,None],[None,None,tile.Tile('G'),None,None],[None,None,tile.Tile('O'),None,None],
-                      [None,None,tile.Tile('A'),None,None],[None,None,tile.Tile('L'),None,None]]
+  boards.BOARD_SIZE = 7
+  boards.tiles = [[None,None,None,None,None,None,None],
+                  [None,None,None,None,tile.Tile('G'),None,None]
+                  ,[None,None,None,None,tile.Tile('O'),None,None],
+                      [None,None,None,None,tile.Tile('A'),None,None],
+                      [None,None,None,None,tile.Tile('L'),None,None],
+                      [None,None,None,None,None,None,None],
+                      [None,None,None,None,None,None,None]]
                       
-  boards.tray = [tile.Tile('A'),tile.Tile('O'),tile.Tile('T')]
+  
+
+                      
+  boards.tray = [tile.Tile('T'),tile.Tile('C'),tile.Tile('K'),tile.Tile('P'),tile.Tile('N')]
         
   #for i in range(5):
   print(boards.executeMove(False))
