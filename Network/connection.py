@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
-
-'''
- import the library if you want and use it here to conncect with 
- server some testing function 
-here they use postman so take care of that
-
-''' 
- #RestfulClient.py
-
 import requests
-
 import json
 from time import sleep
+import BoardD.rack as rack 
+import Generator.board as board
 
 # Replace with the correct URL
 url = "http://localhost:62027/api/"
+
+
+
+
 
 def joinGame():
 
@@ -29,12 +24,12 @@ def joinGame():
         # Loading the response data into a dict variable
         # json.loads takes in only binary or string variables so using content to fetch binary content
         # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
-        jData = json.loads(myResponse.content)
+        jData = json.loads(myResponse.text)
 
         #print("The response contains {0} properties".format(len(jData)))
 
         for key in jData:
-            print str(key) + " : " + str(jData[key])
+            print ()
     else:
       # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
@@ -52,23 +47,26 @@ def getGameState(hash,ID):
         # Loading the response data into a dict variable
         # json.loads takes in only binary or string variables so using content to fetch binary content
         # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
-        jData = json.loads(myResponse.content)
+        jData = json.loads(myResponse.text)
 
         #print("The response contains {0} properties".format(len(jData)))
 
         for key in jData:
-            print str(key) + " : " + str(jData[key])
+           print ()
     else:
       # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
     return jData["Board"],jData["Letters"],jData["Turn"]
 
-def sendMove(ID, hash, Board, Letters, Turn):
-
-    head = {"Hash": str(hash), "Board":str(Board)}
-
+def sendMove(ID, hash, Board):
+    d = {}
+    d['Board'] = Board
+    
+    print("json.dumps(d)",str(json.dumps(d)))
+    head = {"Hash": str(hash), "Move": str(json.dumps(d))}
+    print("head=========",head)
     myResponse = requests.post(str(url + "game/" + str(ID)), headers=head)
-
+    
     # print (myResponse.status_code)
 
     # For successful API call, response code will be 200 (OK)
@@ -77,12 +75,11 @@ def sendMove(ID, hash, Board, Letters, Turn):
         # Loading the response data into a dict variable
         # json.loads takes in only binary or string variables so using content to fetch binary content
         # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
-        jData = json.loads(myResponse.content)
-
+        jData = json.loads(myResponse.text)
+        
         # print("The response contains {0} properties".format(len(jData)))
-
-        #for key in jData:
-         #   print str(key) + " : " + str(jData[key])
+        for key in jData:
+            print (str(key) + " : " + str(jData[key]))
     else:
         # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
@@ -90,24 +87,39 @@ def sendMove(ID, hash, Board, Letters, Turn):
 
 def main():
     hash,ID = joinGame()
-    print hash,ID
-    Turn=0
+    print (hash,ID)
+    # here we call the player file and send board,letter,turn
+    tnp(0,True,hash,ID)
+    #player.Player(ID,hash)
+    
+def tnp(Turn,IsFirstTurn,hash,ID):
     while(Turn!=ID):
-        Board,Letters,Turn = getGameState(hash,ID)
+        BoardMain,Letters,Turn = getGameState(hash,ID)
         sleep(0.1)
 
-    print(Letters)
-    play =[]
-    letter = raw_input("Type a letter, an X, and a Y in form \"A 4 5\"")
-    while (letter != ""):
-        play = letter.split(' ')
-        Board[0][int(play[1])][int(play[2])] = play[0]
-        Board[1][int(play[1])][int(play[2])] = str(int(Board[1][int(play[1])][int(play[2])]) + 1)
-        letter = raw_input("Type a letter, an X, and a Y in form \"A 4 5\"")
-    i = 4
-    for letter in word:
+    theBoard = BoardMain[0]
+    print("theBoard====",theBoard)
+    board_Obj = board.Board(theBoard,Letters)
+    rack_Obj = rack.Rack(board_Obj,Letters)
+        
+        
+    playedMove = board_Obj.executeMove(IsFirstTurn) 
 
-        i=i+1
-    print Board
-    raw_input()
-    sendMove(ID, hash, Board, Letters, Turn)
+    if(playedMove):
+            (success,inPlay,boardx) = rack_Obj.Play(IsFirstTurn) # here there are three option for sucess True,False,End
+            print("successsuccess=========================",success)
+            if success == "END":
+                print("Picture abhi baki hey mere DOST")
+            elif success:
+                print("inPlay",inPlay)
+                for (x,y) in inPlay:
+                    print(boardx[x][y].letter)
+                    BoardMain[0][x][y] = boardx[x][y].letter
+                    BoardMain[1][x][y] = str(int(BoardMain[1][x][y]) + 1)
+                    
+                sendMove(ID, hash, BoardMain)
+                tnp(0,False,hash,ID)
+            else:
+                print("AI think It has a move but it doesn't")
+    
+main()

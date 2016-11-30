@@ -8,7 +8,8 @@ like add,shuffle,regenerate,empty or not,
  
 '''
 import time
-import tile, bag, board, aiStats
+from BoardD import tile
+from Generator import board, aiStats
 
 class Rack:
  
@@ -19,26 +20,32 @@ class Rack:
     @staticmethod
     def initialize():
         Rack.initialized = True
-        Rack.aiStats = aiStats.AIStats()
+        #Rack.aiStats = aiStats.AIStats()
     
     '''
     Initialize a new rack and score for a player.
     '''
-    
-            
+    '''
     def __init__(self, name, theBoard, theBag):
+    changed by tanmay 11/28/2016
+    '''
+            
+    def __init__(self, theBoard,tray):
         if not Rack.initialized:
             Rack.initialize()
         
-        self.tray = []
+       
         self.score = 0
-        self.name = name
+        #self.name = name
         self.theBoard = theBoard
-        self.theBag = theBag
+        self.tray = tray
         self.lastScore = 0
         
         #   Start with a full set of tiles.
-        self.grab()
+        '''
+        they are providing us tray every time so no need to grab as
+        '''
+        #self.grab()
     
     '''
     Returns false if the rack tries to draw new tiles and none exist in the bag (i.e., the game is finished).
@@ -68,18 +75,21 @@ class Rack:
     forcing us to try again.
     '''
     def Play(self, firstTurn):
-        
-        (tiles, points) = self.theBoard.play(firstTurn)
-        
+        print("rackPLay====")
+        (tiles,points, inPlay, board) = self.theBoard.play(firstTurn)
+        print("Return")
+        print("tiles====",tiles)
         #   The play was successful, add the points to our score and grab new tiles
-        if tiles == None and points >= 0:
+        # tanmay changed 11/29/2016
+        #  if tiles == None and points >= 0
+        if tiles == None :
             self.score += points
             self.lastScore = points
-            gameContinues = self.grab()
-            if gameContinues:
-                return True
-            else:
-                return "END"
+            #gameContinues = self.grab()
+            #if gameContinues:
+            return (True,inPlay,board)
+            #else:
+            #    return ("END",inPlay,board)
         
         #   Play didn't work, put the
         elif tiles != None:
@@ -88,10 +98,10 @@ class Rack:
                 self.take(t)
                 assert len(self.tray) <= Rack.TRAY_SIZE
             
-            return False
+            return (False,inPlay,board)
         #   Simple case, we tried to play, but there were no tentative tiles!
         else:
-            return False
+            return (False,inPlay,board)
     
     '''
     Take a tile previously held, should only be called for returning tentative pieces to the tray.

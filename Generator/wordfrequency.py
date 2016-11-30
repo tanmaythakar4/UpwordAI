@@ -3,12 +3,13 @@
 This class stores in a file the count of the words used by all players in all games.
 It can load and update the word frequency file wordfreq.txt.
 '''
-import dictionary, math
+import math
+from Generator import dictionary
 
 class Wordfrequency:
     
-    FILENAME = "Generator/wordfreq.txt"
-    DICTIONARY = "Generator/upwords_usage.txt"
+    FILENAME = "C:\\Users\\tanmay\\Documents\\UpwordAI\\Generator\\wordfreq.txt"
+    DICTIONARY = "C:\\Users\\tanmay\\Documents\\UpwordAI\\Generator\\upwords_usage.txt"
     
     
     def __init__(self):

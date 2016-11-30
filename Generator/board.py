@@ -10,34 +10,49 @@ validate(word,score,timing)
 check upwordrules
 
 '''
-import dictionary, time
-import BoardD.tile as tile
+from Generator import dictionary, wordfrequency
+import time
+from BoardD import tile 
+import numpy as np
+
 class Board:
     
     Debug_errors = True
     DICTIONARY_FILE = '../dictionary.txt'
     BOARD_SIZE = 10
+    TRAY_SIZE = 7
     START_POSITION = [(4,4),(4,5),(5,4),(5,5)]
     
     '''
     Initialize the board, create the squares matrix.
     '''
     
-    def __init__(self):
-        self.tiles = []
+    def __init__(self,board,trayM):
         self.tray = []
+        self.tiles = []
         for x in range(Board.BOARD_SIZE):
             self.tiles.append([])
             for y in range(Board.BOARD_SIZE):
                 #here we are adding tile and some status but as of now we dont know 
                 #which status will helpfull so it's tile only
-                self.tiles[x].append((None))
+                if board[x][y] == "null" or board[x][y] is None:
+                    self.tiles[x].append((None))
+                else:
+                    self.tiles[x].append(tile.Tile(board[x][y]))
+         
+        print("len(tray)==",trayM)
+        for x in trayM:
+            print(x)
+            if x == "null" or x is None:
+                self.tray.append((None))
+            else:
+                self.tray.append(tile.Tile(x))
         
         # Load the dictionary        
         self.dictionaryf = dictionary.Dictionary(Board.DICTIONARY_FILE)
         
         # load dictionary frequency usage (Working)
-        #self.wordfreq = wordFrequency.wordFrequency()
+        self.wordfreq = wordfrequency.Wordfrequency()
         
         #self.resetBoard()
     
@@ -90,6 +105,7 @@ class Board:
          self.maxScore = -1
         
         
+        print("execute")
         
         
         self.theWordsConsidered = ""
@@ -97,7 +113,7 @@ class Board:
         seeds = []
 
         if isFirstMove:
-            seeds = START_POSITION
+            seeds = self.START_POSITION
         else:
             for x in range(self.BOARD_SIZE):
                 for y in range(self.BOARD_SIZE):
@@ -121,6 +137,7 @@ class Board:
                                 
                                 
                         # go right and add tile till end
+                        print("x===",x)
                         if x<self.BOARD_SIZE - 1 and self.tiles[x+1][y] == None:
                             if (x+1,y) not in seeds:
                                 seeds.append((x+1,y))
@@ -182,6 +199,7 @@ class Board:
                              
                      tileSlots.append(horz)
                      tileSlots.append(vert)
+                     
        # print(tileSlots)
                      #print("horz",horz)
                      #print("vert",vert)
@@ -213,9 +231,9 @@ class Board:
                 if tile == None:
                     emptySlots.append((x,y))
                 wordBuilt.append(tile)
-            #print("execturn=(emptyslot)==",emptySlots)
-            #print("execturn=(wordBuilt)==",wordBuilt)
-            #print("tray====",len(self.tray),isFirstMove)
+            print("execturn=(emptyslot)==",emptySlots)
+            print("execturn=(wordBuilt)==",wordBuilt)
+            print("tray====",len(self.tray),isFirstMove)
             
             
             (point, tiles, blankes) = self.tryallPermutation(isFirstMove,wordBuilt,emptySlots,self.tray) 
@@ -225,8 +243,8 @@ class Board:
                  
              
             
-            # NOw we have best tile so play them 
-            if maxtile != None and maxtile != []:
+        # NOw we have best tile so play them 
+        if maxtile != None and maxtile != []:
                 self.placeTiles(maxtile,maxBlanks)
                 playedMove = True
                 
@@ -234,17 +252,17 @@ class Board:
                 
                 #update stats
                 
-            else:
-                playedMove = False
+        else:
+            playedMove = False
                 
-            if self.Debug_errors:
+        if self.Debug_errors:
                 endTime = time.time()
                 timeSpent = endTime - startTime + .00001
                 
                 
-            print("playedMove)====",playedMove)    
+        print("playedMove)====",playedMove)    
                 
-            #return playedMove
+        return playedMove
              #
              #TO BE CONTINUE
         '''
@@ -366,7 +384,7 @@ class Board:
                 
             self.setPiece(pos,tile)
             tile.pulse()
-            self.tray.remove(tile)
+            #self.tray.remove(tile)
         
  
             
@@ -374,11 +392,23 @@ class Board:
     def setPiece(self, value ,tile):
           x = value[0]
           y = value[1]
-          print("setpiece====",x,y,self.tiles[x][y].letter)
+          print("setpiece====",x,y)
           assert x>=0 and y>=0 and x < self.BOARD_SIZE and y < self.BOARD_SIZE
-          assert self.tiles[x][y] == None
+          #assert self.tiles[x][y] == None
           self.tiles[x][y] = tile
-      
+          self.showBoard()
+     
+    #This method print the board
+    def showBoard(self):
+        for i in range(self.BOARD_SIZE):
+            str = ""
+            for j in range(self.BOARD_SIZE):
+                if(self.tiles[i][j]!= None):
+                    str += self.tiles[i][j].letter + " | "
+                else:
+                    str += "*" + " | "
+            print(str,"\n")
+ 
     # Remove tiles if we know already where they are
     def pullTilesFast(self,tilesPlayed):
         if tilesPlayed != None:
@@ -395,11 +425,11 @@ class Board:
     '''
     def removeTempTiles(self):
         inPlay = []
-        for x in range(Board.BOARD_SIZE):
-            for y in range(Board.BOARD_SIZE):
-                if self.tiles[x][y][0] != None and not self.tiles[x][y][0].locked:     
-                    inPlay.append(self.tiles[x][y][0])
-                    self.tiles[x][y] = (None, self.tiles[x][y][1])
+        for x in range(self.BOARD_SIZE):
+            for y in range(self.BOARD_SIZE):
+                if self.tiles[x][y] != None and not self.tiles[x][y].locked:     
+                    inPlay.append(self.tiles[x][y])
+                    self.tiles[x][y] = (None, self.tiles[x][y])
         
         #   Remove the locks the player can play again
         self.columnLock = -1
@@ -426,12 +456,15 @@ class Board:
     def play(self, isFirstTurn = True):
         
         #   Collect all tentative tiles.
-        inPlay = []
-        for x in range(Board.BOARD_SIZE):
-            for y in range(Board.BOARD_SIZE):
-                if self.tiles[x][y][0] != None and not self.tiles[x][y][0].locked:
-                    inPlay.append((x, y))
         
+        print("BoardPlay")
+        inPlay = []
+        for x in range(self.BOARD_SIZE):
+            for y in range(self.BOARD_SIZE):
+                if self.tiles[x][y] != None and not self.tiles[x][y].locked:
+                    print("Main x,y====",x,y)
+                    inPlay.append((x, y))
+        print("After for loop",len(inPlay))
         #   Validation step one: There must be at least one tile played.
         if len(inPlay) <= 0:
             #   Fail
@@ -445,6 +478,7 @@ class Board:
         inAcol = True
         inArow = True
         for (x, y) in inPlay:
+            print("(InPLay===)",x,y)
             if(x != col):
                 inAcol = False
             if(y != row):
@@ -452,12 +486,15 @@ class Board:
         
         if not inArow and not inAcol:
             #   Fail, remove tiles and return
-            if Board.Debug_errors:
+            if self.Debug_errors:
                 print('All tiles must be placed along a line.')
             return (self.removeTempTiles(), -1)
         
-        #   Validation step three: If isFirstMove, then one tile must be on START_POSITION
-        if not Board.START_POSITION in inPlay and inFirstMove:
+        #   Validation step three: If isFirstTurn, then one tile must be on START_POSITION
+        print("INPLAY",inPlay)
+        print("self.START_POSITION",self.START_POSITION)
+        if set(self.START_POSITION).issubset(set(inPlay))  and isFirstTurn:
+            print('Firstturn validation')
             return(self.removeTempTiles(), -1)
         
         
@@ -484,21 +521,22 @@ class Board:
         #   Confirm that the span is unbroken
         if inAcol:
             for y in range(top, bottom + 1):
-                if self.tiles[col][y][0] == None:
+                if self.tiles[col][y] == None:
                     unbroken = False
         elif inArow:
             for x in range(left, right + 1):
-                if self.tiles[x][row][0] == None:
+                if self.tiles[x][row] == None:
                     unbroken = False
         
         if not unbroken:
+            print("unbrokennn")
             return(self.removeTempTiles(), -1)
         
         
         #   Validation steps five and six:
-        (totalScore, spellings, seedRation) = self.validateWords(isFirstMove, inPlay = inPlay)
+        (totalScore, spellings, seedRation) = self.validateWords(isFirstTurn, inPlay = inPlay)
         
-    
+        print("totalScore===",totalScore)
         if spellings != None:
             for spelling in spellings:
                 self.wordfreq.wordPlayed(spelling)
@@ -508,14 +546,15 @@ class Board:
             
         #   Lock tiles played
         for (x, y) in inPlay:
-            self.tiles[x][y][0].locked = True
+            self.tiles[x][y].locked = True
         
         
         #   Remove the locks on the board.
         self.columnLock = -1
         self.rowLock = -1
         
-        return (None, totalScore)
+        print("totalScore22222222222222222===",totalScore)
+        return (None,totalScore, inPlay, self.tiles)
     
     '''
     Calculates the number of seeds and number of tiles and returns them as a tuple
@@ -667,12 +706,12 @@ class Board:
                     # fail word is not in dictionary
                     if self.Debug_errors:
                         self.invalidWordCount += 1
-                    if tilesPlayed == None:
+                    if tilePlayed == None:
                         print("isn't in the dictionary")
-                self.pullTilesFast(tilesPlayed)
+                self.pullTilesFast(tilePlayed)
                 return (-1, None, seedRatio)
                
-         if self.DEBUG_ERRORS:
+         if self.Debug_errors:
             scoringTimeStart = time.time()
             self.dictionaryValidationTime += time.time() - validationTimeStart
 
@@ -722,15 +761,26 @@ class Board:
                     
  #TEST        
 if __name__ == '__main__':    
-  boards = Board()
   #Testing
-  boards.BOARD_SIZE = 5
-  boards.tiles = [[None,None,None,None,None],[None,None,tile.Tile('G'),None,None],[None,None,tile.Tile('O'),None,None],
-                      [None,None,tile.Tile('A'),None,None],[None,None,tile.Tile('L'),None,None]]
+  '''
+  boards = Board()
+  
+  
+  boards.BOARD_SIZE = 7
+  boards.tiles = [[None,None,None,None,None,None,None],
+                  [None,None,None,None,tile.Tile('G'),None,None]
+                  ,[None,None,None,None,tile.Tile('O'),None,None],
+                      [None,None,None,None,tile.Tile('A'),None,None],
+                      [None,None,None,None,tile.Tile('L'),None,None],
+                      [None,None,None,None,None,None,None],
+                      [None,None,None,None,None,None,None]]
                       
-  boards.tray = [tile.Tile('A'),tile.Tile('O'),tile.Tile('T')]
-        
+  
+
+                      
+  boards.tray = [tile.Tile('T'),tile.Tile('C'),tile.Tile('K'),tile.Tile('P'),tile.Tile('N')]
+   '''     
   #for i in range(5):
-  print(boards.executeMove(False))
+  #print(boards.executeMove(False))
         
                     
