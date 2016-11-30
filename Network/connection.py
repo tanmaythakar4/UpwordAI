@@ -29,11 +29,7 @@ def joinGame():
         #print("The response contains {0} properties".format(len(jData)))
 
         for key in jData:
-<<<<<<< HEAD
-            print (str(key) + " : " + str(jData[key]))
-=======
             print ()
->>>>>>> ab623f7ab618074f8bd2228c0fdf18f8635b5086
     else:
       # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
@@ -56,11 +52,7 @@ def getGameState(hash,ID):
         #print("The response contains {0} properties".format(len(jData)))
 
         for key in jData:
-<<<<<<< HEAD
-            print ()
-=======
            print ()
->>>>>>> ab623f7ab618074f8bd2228c0fdf18f8635b5086
     else:
       # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
@@ -84,11 +76,7 @@ def sendMove(ID, hash, Board):
         # json.loads takes in only binary or string variables so using content to fetch binary content
         # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
         jData = json.loads(myResponse.text)
-<<<<<<< HEAD
-
-=======
         
->>>>>>> ab623f7ab618074f8bd2228c0fdf18f8635b5086
         # print("The response contains {0} properties".format(len(jData)))
         for key in jData:
             print (str(key) + " : " + str(jData[key]))
@@ -100,38 +88,15 @@ def sendMove(ID, hash, Board):
 def main():
     hash,ID = joinGame()
     print (hash,ID)
-<<<<<<< HEAD
-    Turn=0
-=======
     # here we call the player file and send board,letter,turn
     tnp(0,True,hash,ID)
     #player.Player(ID,hash)
     
 def tnp(Turn,IsFirstTurn,hash,ID):
->>>>>>> ab623f7ab618074f8bd2228c0fdf18f8635b5086
     while(Turn!=ID):
         BoardMain,Letters,Turn = getGameState(hash,ID)
         sleep(0.1)
 
-<<<<<<< HEAD
-    print(Letters)
-    play =[]
-    letter = input("Type a letter, an X, and a Y in form \"A 4 5\"")
-    while (letter != ""):
-        play = letter.split(' ')
-        Board[0][int(play[1])][int(play[2])] = play[0]
-        Board[1][int(play[1])][int(play[2])] = str(int(Board[1][int(play[1])][int(play[2])]) + 1)
-        letter = input("Type a letter, an X, and a Y in form \"A 4 5\"")
-    i = 4
-    for letter in word:
-
-        i=i+1
-    print (Board)
-    input()
-    sendMove(ID, hash, Board, Letters, Turn)
-
-
-=======
     theBoard = BoardMain[0]
     print("theBoard====",theBoard)
     board_Obj = board.Board(theBoard,Letters)
@@ -157,5 +122,4 @@ def tnp(Turn,IsFirstTurn,hash,ID):
             else:
                 print("AI think It has a move but it doesn't")
     
->>>>>>> ab623f7ab618074f8bd2228c0fdf18f8635b5086
 main()
