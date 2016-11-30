@@ -18,7 +18,8 @@ here I asume that before we start to run this we make another textfile from dict
     
 '''
 
-import board,time
+from Generator import board
+import time
 class Dictionary:
     
     def __init__(self,filename):
