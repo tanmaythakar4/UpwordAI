@@ -8,8 +8,8 @@ from Generator import dictionary
 
 class Wordfrequency:
     
-    FILENAME = "C:\\Users\\tanmay\\Documents\\UpwordAI\\Generator\\wordfreq.txt"
-    DICTIONARY = "C:\\Users\\tanmay\\Documents\\UpwordAI\\Generator\\upwords_usage.txt"
+    FILENAME = "..\\Generator\\wordfreq.txt"
+    DICTIONARY = "..\\Generator\\upwords_usage.txt"
     
     
     def __init__(self):
@@ -40,7 +40,7 @@ class Wordfrequency:
             freqFile.write(word+" "+str(self.count[word])+"\n")
     
     def wordPlayed(self, word):
-        if self.count.has_key(word):
+        if word in self.count:
             self.count[word] += 1
         else:
             self.count[word] = 1

@@ -78,8 +78,7 @@ def sendMove(ID, hash, Board):
         jData = json.loads(myResponse.text)
         
         # print("The response contains {0} properties".format(len(jData)))
-        for key in jData:
-            print (str(key) + " : " + str(jData[key]))
+       
     else:
         # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()

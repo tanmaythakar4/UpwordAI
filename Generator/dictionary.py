@@ -77,7 +77,7 @@ class Dictionary:
                 if i==0:
                     newword = char + word[1:]
                 elif i == len(word)-1:
-                    newword = word[i:-1] + char
+                    newword = word[:-1] + char
                 else:
                     newword = word[:i] + char + word[i+1:]
             newAssignment = assignment[:]

@@ -38,7 +38,9 @@ class Board:
                 if board[x][y] == "null" or board[x][y] is None:
                     self.tiles[x].append((None))
                 else:
-                    self.tiles[x].append(tile.Tile(board[x][y]))
+                    a = tile.Tile(board[x][y])
+                    a.locked = True
+                    self.tiles[x].append(a)
          
         print("len(tray)==",trayM)
         for x in trayM:
@@ -392,9 +394,9 @@ class Board:
     def setPiece(self, value ,tile):
           x = value[0]
           y = value[1]
-          print("setpiece====",x,y)
+          print("setpiece====",x,y,tile.letter,self.tiles[x][y])
           assert x>=0 and y>=0 and x < self.BOARD_SIZE and y < self.BOARD_SIZE
-          #assert self.tiles[x][y] == None
+          assert self.tiles[x][y] == None
           self.tiles[x][y] = tile
           self.showBoard()
      
@@ -419,6 +421,7 @@ class Board:
                     self.tiles[x][y].letter = ' '
                 
                 self.tiles[x][y] = None
+            self.showBoard()
  
     '''
     Returns the temporary tiles on the board and returns them as a list.
@@ -429,7 +432,7 @@ class Board:
             for y in range(self.BOARD_SIZE):
                 if self.tiles[x][y] != None and not self.tiles[x][y].locked:     
                     inPlay.append(self.tiles[x][y])
-                    self.tiles[x][y] = (None, self.tiles[x][y])
+                    self.tiles[x][y] = None
         
         #   Remove the locks the player can play again
         self.columnLock = -1
@@ -456,8 +459,6 @@ class Board:
     def play(self, isFirstTurn = True):
         
         #   Collect all tentative tiles.
-        
-        print("BoardPlay")
         inPlay = []
         for x in range(self.BOARD_SIZE):
             for y in range(self.BOARD_SIZE):
@@ -477,6 +478,7 @@ class Board:
         row = inPlay[0][1]
         inAcol = True
         inArow = True
+        
         for (x, y) in inPlay:
             print("(InPLay===)",x,y)
             if(x != col):
@@ -600,7 +602,7 @@ class Board:
              inPlay = []
              for pos, tile in tilePlayed:
                  print("validate word tilePlayed!=None",pos,tile.letter)
-                 self.setPiece(pos,tile)
+                 #self.setPiece(pos,tile)
                  inPlay.append(pos)
                  
          if self.Debug_errors:
@@ -674,10 +676,14 @@ class Board:
                  wordsBuilt.append([((col,y),self.tiles[col][y]) for y in range(up , down+1)])
             
          crossWordMade = False
+         self.showBoard()
+         print(wordsBuilt)
          for word in wordsBuilt:
                for ((x,y), tile) in word:
-                   if tile.locked:
-                       crossWordMade = True
+                   print("x,y lockeddddd",x,y)
+                   if not tile == None:
+                       if tile.locked:
+                           crossWordMade = True
                 
             
          if self.Debug_errors:
@@ -706,10 +712,10 @@ class Board:
                     # fail word is not in dictionary
                     if self.Debug_errors:
                         self.invalidWordCount += 1
-                    if tilePlayed == None:
-                        print("isn't in the dictionary")
-                self.pullTilesFast(tilePlayed)
-                return (-1, None, seedRatio)
+                        if tilePlayed == None:
+                            print("isn't in the dictionary")
+                    self.pullTilesFast(tilePlayed)
+                    return (-1, None, seedRatio)
                
          if self.Debug_errors:
             scoringTimeStart = time.time()
@@ -732,7 +738,7 @@ class Board:
          wordScore = {} # contain word score for all words
          wordScoreOptimize = [] #stores words where word bonuses are conflicted
          i = 0
-         for word in wordBuilt:
+         for word in wordsBuilt:
                 wordScore[i] = 0
                 wordBonus = 1
                 marks=[] # we get bonus for only one word;
