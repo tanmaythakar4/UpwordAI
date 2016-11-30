@@ -9,6 +9,19 @@ Stats:  Timing
         Seed
         Game
         
-this wii generate text file
+this will generate text file
         
 '''
+
+
+class AIStats():
+    
+    FILENAME = "Generator/aistats.txt"
+    COLLECT_WORD_DATA = False
+    COLLECT_GAME_DATA = False
+    
+    def __init__(self):
+        
+        self.timingInfo = []
+        self.letterPlays = {}
+        for code in range(ord('A'))
