@@ -36,7 +36,7 @@ class Board:
                 #here we are adding tile and some status but as of now we dont know 
                 #which status will helpfull so it's tile only
                 if board[x][y] == "null" or board[x][y] is None:
-                    self.tiles[x].append((None))
+                    self.tiles[x].append(None)
                 else:
                     a = tile.Tile(board[x][y])
                     a.locked = True
@@ -56,12 +56,13 @@ class Board:
         # load dictionary frequency usage (Working)
         self.wordfreq = wordfrequency.Wordfrequency()
         
-        #self.resetBoard()
+        self.resetAllMetrics()
     
     '''
     Resets all timers
     '''
     def resetAllMetrics(self):
+        print("resetAllMetrics=======================")
         self.scoringTime = 0
         self.crosswordValidationTime = 0
         self.dictionaryValidationTime = 0
@@ -95,7 +96,7 @@ class Board:
     
     def executeMove(self,isFirstMove):
 
-        
+        print("ExecuteMOve=======================")
         # calculate the time still working
         startTime = time.time()
         if self.Debug_errors:
@@ -107,7 +108,7 @@ class Board:
          self.maxScore = -1
         
         
-        print("execute")
+        print("executeMovesss =======================")
         
         
         self.theWordsConsidered = ""
@@ -218,12 +219,14 @@ class Board:
             (x2,y2) = slot[-1]
             
             if tileslotsmap.get((x1,y1,x2,y2),False):
-                            tileSlots.pop(i)
-                            numEliminate += 1
+                tileSlots.pop(i)
+                numEliminate += 1
             else:
                 tileslotsmap[x1,y1,x2,y2] = True
                 i += 1
-                            
+        
+        tileSlots = self.reorderTileSlots(tileSlots)
+                   
         for tileslot in tileSlots:
             emptySlots = []
             wordBuilt = []
@@ -260,21 +263,40 @@ class Board:
         if self.Debug_errors:
                 endTime = time.time()
                 timeSpent = endTime - startTime + .00001
-                
+       # aisats update to be continue         
                 
         print("playedMove)====",playedMove)    
                 
         return playedMove
-             #
-             #TO BE CONTINUE
-        '''
-        Here we have given a set of position ,this function will try all the combination of tray tiles 
-        that could be inserted and return the score and tile placed of the highest scoring combination by asking the board
+
+    def reorderTileSlots(self, tileSlots):
+        orderedBySlots = [[] for i in range(self.TRAY_SIZE+1)]
+        for tileSlot in tileSlots:
+            i = 0
+            for pos, slot in tileSlot:
+                if slot == None:
+                    i += 1
+            assert i < len(orderedBySlots)    
+            orderedBySlots[i].append(tileSlot)
         
-        word = wordbuilt
-        slots = emptyslots 
-        '''
+        newTileSlots = []    
+        for ranking in orderedBySlots:
+            if len(ranking) > 0:
+                for tileSlot in ranking:
+                    newTileSlots.append(tileSlot)
+                    
+        return newTileSlots
+      #
+    #TO BE CONTINUE
+    '''
+    Here we have given a set of position ,this function will try all the combination of tray tiles 
+    that could be inserted and return the score and tile placed of the highest scoring combination by asking the board
+    
+    word = wordbuilt
+    slots = emptyslots 
+    '''
     def tryallPermutation(self,isFirstMove, word, slots, traytiles, tilesPlaced = []):
+        print("tryallPermutation================")
         if len(slots) == 0:
             if self.Debug_errors:
                 startValidation = time.time()
@@ -292,7 +314,7 @@ class Board:
                 else:
                     #spelling += tilesplaced[i][1].letter
                     spelling += tilesPlaced[i][1].letter
-                    i+=1
+                    i += 1
                   
             # if there no blank
             if not ' ' in spelling:
@@ -307,13 +329,14 @@ class Board:
                     
                     # validate the word
                     (score, dummy, seedRatio) = self.validateWords(isFirstMove, tilePlayed = tilesPlaced)
+                    print("score from Validation  not space in spelling ",score ,dummy)
                 else:
                     score = -1000
             else:
                 # get all the assignments that orrespond to real word
                 blankAssignment = self.dictionaryf.matchWithBlanks(spelling)
                 rawValidation = 0
-                if len(blankAssignment) >0:
+                if len(blankAssignment) > 0:
                     for assignmensts in blankAssignment:
                         
                         #Apply assignment to the blank
@@ -334,8 +357,8 @@ class Board:
                         
                         # validate the word
                         (score, dummy, seedRatio) = self.validateWords(isFirstMove, tilePlayed = tilesPlaced)
-                        
-                        if score>0:
+                        print("score from Validation  ' > 0 ' ",score ,dummy)
+                        if score > 0:
                             blankAssignment = assignmensts
                             break
                 else:
@@ -352,13 +375,14 @@ class Board:
                    '''
             
                 #score += self.heuristic.adjust(trayTiles = self.tray, playTiles = tilesPlaced, seedRatio = seedRatio)    
-                
+            print("Score======board=====",score)    
             if score > self.maxScore:
                 self.maxScore = score
                 self.maxWordTimeStamp = time.time()
                   
                 
-            return (score, tilesPlaced, blankAssignment)            
+            return (score, tilesPlaced, blankAssignment)  
+        #recursive CASE    
         else:
             slot = slots[0]
             
@@ -368,16 +392,17 @@ class Board:
                     newTilesPlaced.append((slot, tile))
                     trayRemaining = traytiles[:]
                     trayRemaining.remove(tile)
-                    print("Sloat[1:]",slots[1:])
+                    
                     (score,tilesTried,blankAssignment) = self.tryallPermutation(isFirstMove,word,slots[1:],trayRemaining,newTilesPlaced)
+                    print("score====score==score=====",score , maxScore)
                     if score > maxScore:
                         maxScore, maxTiles, maxBlanks = score, tilesTried, blankAssignment
-                    
+            print("maxScore====maxScore==board=====",maxScore)         
             return (maxScore, maxTiles, maxBlanks)
     
      # apply tiles to the board and remove it from Tray       
     def placeTiles(self,tiles,blanks):
-        
+        print("placeTiles===================")
         i=0
         for (pos ,tile) in tiles:
             if tile.isBlank and blanks != None and i < len(blanks):
@@ -386,12 +411,13 @@ class Board:
                 
             self.setPiece(pos,tile)
             tile.pulse()
-            #self.tray.remove(tile)
+            self.tray.remove(tile)
         
  
             
       #puts a tile on board
     def setPiece(self, value ,tile):
+          print("setpiece============")
           x = value[0]
           y = value[1]
           print("setpiece====",x,y,tile.letter,self.tiles[x][y])
@@ -402,6 +428,8 @@ class Board:
      
     #This method print the board
     def showBoard(self):
+        
+        
         for i in range(self.BOARD_SIZE):
             str = ""
             for j in range(self.BOARD_SIZE):
@@ -412,16 +440,15 @@ class Board:
             print(str,"\n")
  
     # Remove tiles if we know already where they are
-    def pullTilesFast(self,tilesPlayed):
-        if tilesPlayed != None:
-            for (x,y),tile in tilesPlayed:
+    def pullTilesFast(self,tilePlayed):
+        if tilePlayed != None:
+            for (x,y),tile in tilePlayed:
                 assert self.tiles[x][y] != None
                 assert self.tiles[x][y].locked == False
                 if self.tiles[x][y].isBlank:
                     self.tiles[x][y].letter = ' '
                 
                 self.tiles[x][y] = None
-            self.showBoard()
  
     '''
     Returns the temporary tiles on the board and returns them as a list.
@@ -457,21 +484,19 @@ class Board:
     
     '''
     def play(self, isFirstTurn = True):
-        
+        print("play===================")
         #   Collect all tentative tiles.
         inPlay = []
         for x in range(self.BOARD_SIZE):
             for y in range(self.BOARD_SIZE):
                 if self.tiles[x][y] != None and not self.tiles[x][y].locked:
-                    print("Main x,y====",x,y)
                     inPlay.append((x, y))
-        print("After for loop",len(inPlay))
         #   Validation step one: There must be at least one tile played.
         if len(inPlay) <= 0:
             #   Fail
             if Board.Debug_errors:
                 print('Play requires at least one tile.')
-            return ([], -1)
+            return ([], -1 , inPlay, self.tiles)
         
         #   Validation step two: Tiles must be played on a straight line.
         col = inPlay[0][0]
@@ -490,14 +515,12 @@ class Board:
             #   Fail, remove tiles and return
             if self.Debug_errors:
                 print('All tiles must be placed along a line.')
-            return (self.removeTempTiles(), -1)
+            return (self.removeTempTiles(), -1 ,inPlay, self.tiles)
         
         #   Validation step three: If isFirstTurn, then one tile must be on START_POSITION
-        print("INPLAY",inPlay)
-        print("self.START_POSITION",self.START_POSITION)
         if set(self.START_POSITION).issubset(set(inPlay))  and isFirstTurn:
             print('Firstturn validation')
-            return(self.removeTempTiles(), -1)
+            return(self.removeTempTiles(), -1 ,inPlay, self.tiles)
         
         
         #   Validation step four: Word created is unbroken.
@@ -532,8 +555,7 @@ class Board:
         
         if not unbroken:
             print("unbrokennn")
-            return(self.removeTempTiles(), -1)
-        
+            return(self.removeTempTiles(), -1 ,inPlay, self.tiles)
         
         #   Validation steps five and six:
         (totalScore, spellings, seedRation) = self.validateWords(isFirstTurn, inPlay = inPlay)
@@ -562,6 +584,7 @@ class Board:
     Calculates the number of seeds and number of tiles and returns them as a tuple
     '''
     def calculateSeedRatio(self):
+        print("calculateseedRatio===============")
         numSeeds = 0
         numTiles = 0
         for x in range(self.BOARD_SIZE):
@@ -590,6 +613,7 @@ class Board:
      '''
      
     def validateWords(self, isFirstMove , tilePlayed= None, inPlay= None ):
+         print("validateWords==========================")
          if self.Debug_errors:
              startTime = time.time()
              
@@ -601,8 +625,8 @@ class Board:
          if tilePlayed != None:
              inPlay = []
              for pos, tile in tilePlayed:
-                 print("validate word tilePlayed!=None",pos,tile.letter)
-                 #self.setPiece(pos,tile)
+                 print("validate word setPiece tilePlayed!=None",pos,tile.letter)
+                 self.setPiece(pos,tile)
                  inPlay.append(pos)
                  
          if self.Debug_errors:
@@ -677,7 +701,7 @@ class Board:
             
          crossWordMade = False
          self.showBoard()
-         print(wordsBuilt)
+         print("wordsBuilt validateword afteer col row",wordsBuilt)
          for word in wordsBuilt:
                for ((x,y), tile) in word:
                    print("x,y lockeddddd",x,y)
@@ -740,15 +764,14 @@ class Board:
          i = 0
          for word in wordsBuilt:
                 wordScore[i] = 0
-                wordBonus = 1
-                marks=[] # we get bonus for only one word;
+                #wordBonus = 1
                 for (x,y), tile in word:
                     letterScore = 1 # here we assume that all the letter have equal value
                     # bonus logic if exist
                     wordScore[i] += letterScore
-                wordScore[i] *= wordBonus
+                #wordScore[i] *= wordBonus
                 i += 1
-                
+         print("wordScore validateword scoring ++++",wordScore.keys,"value==",wordScore.values)      
           #if are conflict then all go through all permutation to retrive the highest possible score
           #to be continue
 
@@ -761,32 +784,33 @@ class Board:
 
             # pull the tiles if we put that in this call
             #left
-         
+         self.pullTilesFast(tilePlayed)
+         print("totalScoreeeeeeeeeeee===",totalScore, spellings)
          return (totalScore, spellings, seedRatio)
          
-                    
- #TEST        
-if __name__ == '__main__':    
-  #Testing
-  '''
-  boards = Board()
-  
-  
-  boards.BOARD_SIZE = 7
-  boards.tiles = [[None,None,None,None,None,None,None],
-                  [None,None,None,None,tile.Tile('G'),None,None]
-                  ,[None,None,None,None,tile.Tile('O'),None,None],
-                      [None,None,None,None,tile.Tile('A'),None,None],
-                      [None,None,None,None,tile.Tile('L'),None,None],
-                      [None,None,None,None,None,None,None],
-                      [None,None,None,None,None,None,None]]
-                      
-  
-
-                      
-  boards.tray = [tile.Tile('T'),tile.Tile('C'),tile.Tile('K'),tile.Tile('P'),tile.Tile('N')]
-   '''     
-  #for i in range(5):
-  #print(boards.executeMove(False))
+         '''                   
+         #TEST        
+         #if __name__ == '__main__':    
+             #Testing
+             
+             boards = Board()
+             
+             
+             boards.BOARD_SIZE = 7
+             boards.tiles = [[None,None,None,None,None,None,None],
+                             [None,None,None,None,tile.Tile('G'),None,None]
+                             ,[None,None,None,None,tile.Tile('O'),None,None],
+                          [None,None,None,None,tile.Tile('A'),None,None],
+                          [None,None,None,None,tile.Tile('L'),None,None],
+                          [None,None,None,None,None,None,None],
+                          [None,None,None,None,None,None,None]]
+                          
+                          
+                          
+                          
+                          boards.tray = [tile.Tile('T'),tile.Tile('C'),tile.Tile('K'),tile.Tile('P'),tile.Tile('N')]
+      '''     
+      #for i in range(5):
+          #print(boards.executeMove(False))
         
                     
