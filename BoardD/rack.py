@@ -30,15 +30,15 @@ class Rack:
     changed by tanmay 11/28/2016
     '''
             
-    def __init__(self, theBoard,tray):
+    def __init__(self, board_Obj = None):
         if not Rack.initialized:
             Rack.initialize()
         
        
         self.score = 0
         #self.name = name
-        self.theBoard = theBoard
-        self.tray = tray
+        self.theBoard = board_Obj
+        self.tray = board_Obj.tray
         self.lastScore = 0
         
         #   Start with a full set of tiles.
@@ -82,7 +82,7 @@ class Rack:
         #   The play was successful, add the points to our score and grab new tiles
         # tanmay changed 11/29/2016
         #  if tiles == None and points >= 0
-        if tiles == None :
+        if tiles == None and points >= 0 :
             self.score += points
             self.lastScore = points
             #gameContinues = self.grab()
