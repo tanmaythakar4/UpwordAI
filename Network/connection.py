@@ -3,7 +3,6 @@ import json
 from time import sleep
 import BoardD.rack as rack 
 import Generator.board as board
-
 # Replace with the correct URL
 url = "http://localhost:62027/api/"
 
@@ -11,8 +10,8 @@ url = "http://localhost:62027/api/"
 
 
 
-def joinGame():
 
+def joinGame():
     myResponse = requests.get(url+"user")
 
 
@@ -51,8 +50,7 @@ def getGameState(hash,ID):
 
         #print("The response contains {0} properties".format(len(jData)))
 
-        for key in jData:
-           print ()
+        
     else:
       # If response code is not ok (200), print the resulting http error code with description
         myResponse.raise_for_status()
@@ -99,7 +97,7 @@ def tnp(Turn,IsFirstTurn,hash,ID):
     theBoard = BoardMain[0]
     print("theBoard====",theBoard)
     board_Obj = board.Board(theBoard,Letters)
-    rack_Obj = rack.Rack(board_Obj,Letters)
+    rack_Obj = rack.Rack(board_Obj)
         
         
     playedMove = board_Obj.executeMove(IsFirstTurn) 
