@@ -2,28 +2,46 @@
 '''
 
 '''
-from BoardD import tile as ts
+from BoardD import tile
 
 class TileStack:
-    
-    MAX_STACK_HEIGHT = 5
-    
-    def __init__(self):
+        
+    def __init__(self, maxStackHeight = 5):
+        self.maxStackHeight = maxStackHeight
+        self.tiles = []
         self.tileStack = []
     
-    #   Method for pushing a tile on tileStack.
-    def push(self, tile_temp):
-        self.tileStack.append(tile_temp)
-    
-    #   Method for remove a tile 
     
     #   Method to check whether the tileStack is empty or not.
     def isEmpty(self):
-        return (self.tileStack == [])
+        if len(self.tileStack) == 0:
+            return True
+        else:
+            return False
+        #return (self.tileStack == [])
+    
+    def isFull(self):
+        if len(self.tileStack) == self.maxStackHeight:
+            return True
+        else:
+            return False
+    
+    #   Method for pushing a tile on tileStack.
+    def push(self, tileStack):
+        if not self.isFull():
+            self.tileStack.append(tileStack)
+            return "OK"
+        else:
+            return "ERR_STACK_FULL"
     
     #   Method for popping a tile from tileStack.
     def pop(self):
-        return self.tileStack.pop()
+        if not self.isEmpty():
+            output = self.tileStack(len(self.tileStack) - 1)
+            del self.tileStack[len(self.tileStack) - 1]
+            return output, "OK"
+        else:
+            return "ERR_STACK_EMPTY"
     
     #   Method to get the top of the tileStack.
     def topOfTilestack(self):
