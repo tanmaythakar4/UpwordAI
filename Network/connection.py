@@ -113,10 +113,15 @@ def tnp(Turn,IsFirstTurn,hash,ID):
                     print(boardx[x][y].letter)
                     BoardMain[0][x][y] = boardx[x][y].letter
                     BoardMain[1][x][y] = str(int(BoardMain[1][x][y]) + 1)
-                    
+                #input("Sucsses wait for reply")    
                 sendMove(ID, hash, BoardMain)
+                
                 tnp(0,False,hash,ID)
             else:
                 print("AI think It has a move but it doesn't")
+                sendMove(ID, hash, BoardMain)
+    else:
+        #input("Blank Move")
+        sendMove(ID, hash, BoardMain)
     
 main()
