@@ -75,10 +75,7 @@ class Rack:
     forcing us to try again.
     '''
     def Play(self, firstTurn):
-        print("rackPLay====")
         (tiles,points, inPlay, board) = self.theBoard.play(firstTurn)
-        print("Return")
-        print("tiles====",tiles)
         #   The play was successful, add the points to our score and grab new tiles
         # tanmay changed 11/29/2016
         #  if tiles == None and points >= 0

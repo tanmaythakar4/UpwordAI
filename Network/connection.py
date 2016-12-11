@@ -94,9 +94,9 @@ def tnp(Turn,IsFirstTurn,hash,ID):
         BoardMain,Letters,Turn = getGameState(hash,ID)
         sleep(0.1)
 
-    theBoard = BoardMain[0]
-    print("theBoard====",theBoard)
-    board_Obj = board.Board(theBoard,Letters)
+    #theBoard = BoardMain[0]
+    #print("theBoard====",theBoard)
+    board_Obj = board.Board(BoardMain,Letters)
     rack_Obj = rack.Rack(board_Obj)
         
         
@@ -104,16 +104,14 @@ def tnp(Turn,IsFirstTurn,hash,ID):
 
     if(playedMove):
             (success,inPlay,boardx) = rack_Obj.Play(IsFirstTurn) # here there are three option for sucess True,False,End
-            print("successsuccess=========================",success)
             if success == "END":
                 print("Picture abhi baki hey mere DOST")
             elif success:
-                print("inPlay",inPlay)
                 for (x,y) in inPlay:
-                    print(boardx[x][y].letter)
-                    BoardMain[0][x][y] = boardx[x][y].letter
+                    BoardMain[0][x][y] = boardx[x][y].topOfTilestack().letter
                     BoardMain[1][x][y] = str(int(BoardMain[1][x][y]) + 1)
-                #input("Sucsses wait for reply")    
+                #input("Sucsses wait for reply")   
+                board_Obj.showBoard()
                 sendMove(ID, hash, BoardMain)
                 
                 tnp(0,False,hash,ID)
