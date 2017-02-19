@@ -9,8 +9,6 @@
 # all python file should be releated to network for connction with server and make call (GET/POST)
 # (4) Test :
 # this for future use at last if we want to test the algorithm we can use this python file to make a call.
-# (5) lib :
-# same as a Test we can use to add module. I think for network we need to add module.
 # (6) Dictionary.txt: its list of words which we gonna use through out the project.
 # (7) main.py :
 # This python file is our starting point. This is for maintaining the structure.
