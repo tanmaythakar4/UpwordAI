@@ -1,8 +1,5 @@
 # UpwordAI
 # It's a group project for subject Artificial Intelligence (ECE 577) - (Programming Language - Python 3). Classic game Upword using AI.
-# First Of all it's private repositary.
-# Please try to learn to clone the repositary and maintain it from youtube(how to make a branch and how to commit).
-# Please try to maintain the project data structure globally.
 # Here We have five folders as we discused for first phase.
 # (1) Board : it contain bag.py, tile.py, rack.py
 # all the python file which is releated to board like 7 letter rack or full bag of letters, double array for board should maintain here.
