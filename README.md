@@ -1,5 +1,5 @@
 # UpwordAI
-# It's a group project for subject Artificial Intelligence (ECE 577) - (Programming Language - Python 3). Classic game Upword using AI.
+# It's a project for subject Artificial Intelligence (ECE 577) - (Programming Language - Python 3). Classic game Upword using AI.
 # Here We have five folders as we discused for first phase.
 # (1) Board : it contain bag.py, tile.py, rack.py
 # all the python file which is releated to board like 7 letter rack or full bag of letters, double array for board should maintain here.
